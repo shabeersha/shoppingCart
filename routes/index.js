@@ -28,7 +28,7 @@ router.get('/', function(req, res, next) {
     category:"Tablet"
   }
 ]
-  res.render('index', { products });
+  res.render('index', { products,admin:false });
 });
 
 module.exports = router;
