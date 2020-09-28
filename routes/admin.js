@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var hbsHelpers = require('../helpers/hbs-helpers')
+var productHelpers = require('../helpers/product-helpers')
 
 /* GET admin listing. */
 router.get('/', function(req, res, next) {
@@ -40,7 +41,17 @@ router.get('/add-products',function(req,res){
 router.post('/add-products',(req,res)=>{
   console.log(req.body)
   console.log(req.files.images)
-  res.render('admin/add-product')
+
+  productHelpers.addProduct(req.body,(id)=>{
+    let imageFile=req.files.images
+    imageFile.mv('./public/product-images/'+id+'.jpg',(err,done)=>{
+      if(!err){
+        res.render('admin/add-product')
+      }else{
+        console.log(err)
+      }
+    })
+  })
 })
 
 module.exports = router;
