@@ -13,6 +13,7 @@
                     <th scope="col">Description</th>
                     <th scope="col">Price</th>
                     <th scope="col">Image</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -24,6 +25,9 @@
                     <td>{{this.description}}</td>
                     <td>{{this.price}}/-</td>
                     <td><img style="width: 4em;" src="/product-images/{{this._id}}.jpg" alt="{{this.Name}} image"></td>
+                    <td><a href="/admin/edit-product" class="btn btn-primary">Edit</a>
+                        <a href="/admin/delete-product/{{this._id}}" class="btn btn-danger" onclick="return confirm('Do you want to delete the product {{this.Name}}')">Delete</a></td>
+                    
                 </tr>
                 {{/each}}
 

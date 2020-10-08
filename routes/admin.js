@@ -1,7 +1,9 @@
+const { response } = require('express');
 var express = require('express');
 var router = express.Router();
 var hbsHelpers = require('../helpers/hbs-helpers')
 var productHelpers = require('../helpers/product-helpers')
+
 
 
 /* GET admin listing. */
@@ -29,6 +31,13 @@ router.post('/add-products',(req,res)=>{
         console.log(err)
       }
     })
+  })
+})
+router.get('/delete-product/:id',(req,res)=>{
+  let proId = req.params.id
+  console.log(proId);
+  productHelpers.deleteProduct(proId).then((response)=>{
+    res.redirect('/admin/')
   })
 })
 
