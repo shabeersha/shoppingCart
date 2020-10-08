@@ -1,6 +1,6 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #7952b3;">
-        <a class="navbar-brand text-white" href="#">
+        <a class="navbar-brand text-white" href="/">
 
             <svg width="1.5em" height="1.5em" viewBox="0 0 16 16"
                 class="bi bi-cart4 d-inline-block align-top text-white" fill="currentColor"
@@ -27,10 +27,23 @@
                     <a class="nav-link text-white" href="#">Orders</a>
                 </li>
             </ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
-            </form>
+            <div class="dropdown">
+  <button class="btn dropdown-toggle text-white" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    {{#if user}}
+    {{user.Name}}
+    {{else}}
+    Account
+    {{/if}}
+  </button>
+  <div class="dropdown-menu " aria-labelledby="dropdownMenuButton" style="background-color: #7952b3;">
+      {{#if user}}
+      <a class="dropdown-item text-white" href="/logout">Logout</a>
+      {{else}}
+      <a class="dropdown-item text-white" href="/login">Login</a>
+      {{/if}}
+    
+  </div>
+</div>
         </div>
     </nav>
 </header>

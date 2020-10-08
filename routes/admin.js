@@ -3,11 +3,15 @@ var router = express.Router();
 var hbsHelpers = require('../helpers/hbs-helpers')
 var productHelpers = require('../helpers/product-helpers')
 
+
 /* GET admin listing. */
 router.get('/', function(req, res, next) {
-  
-let findex = hbsHelpers.formatIndex;
-  res.render('admin/view-products',{admin:true,products,helpers:{findex}})
+  productHelpers.getAllProducts().then((products)=>{
+
+    let findex = hbsHelpers.formatIndex;
+    res.render('admin/view-products',{admin:true,products,helpers:{findex}})
+
+  })
 });
 
 router.get('/add-products',function(req,res){

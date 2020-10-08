@@ -1,34 +1,51 @@
+const { log } = require('debug');
+const { response } = require('express');
 var express = require('express');
 var router = express.Router();
+var productHelpers = require('../helpers/product-helpers')
+var userHelpers =require('../helpers/userHelpers')
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  let products = [{
-    name:"iphone 11",
-    description:"Iphone 11 (64GB BLACK)",
-    image:"https://images-na.ssl-images-amazon.com/images/I/51kGDXeFZKL._SX522_.jpg",
-    category:"Mobile"
-  },
-  {
-    name:"Samsung A70s",
-    description:"Samsung A70s (128GB INDIGO)",
-    image:"https://images-na.ssl-images-amazon.com/images/I/61jkp2mBnqL._SX522_.jpg",
-    category:"Mobile"
-  },
-  {
-    name:"Macbook Pro Air",
-    description:"Apple Macbook Pro Air ",
-    image:"https://images-na.ssl-images-amazon.com/images/I/71Ae0NSObSL._SX522_.jpg",
-    category:"Laptop"
-  },
-  {
-    name:"Apple Ipad Air 2",
-    description:"Apple Ipad Air 2",
-    image:"https://images-na.ssl-images-amazon.com/images/I/718pwrPBjcL._SX522_.jpg",
-    category:"Tablet"
-  }
-]
-  res.render('index', { products,admin:false });
+router.get('/', function(req, res) {
+  let user = req.session.user
+  productHelpers.getAllProducts().then((products)=>{
+    res.render('user/view-products', { products,user});
+  })
 });
+
+router.get('/login',(req,res)=>{
+  res.render('user/login')
+})
+
+
+router.post('/login',(req,res)=>{
+  userHelpers.doLogin(req.body).then((response)=>{
+    if(response.status){
+      req.session.loggedIn = true
+      req.session.user = response.user
+      res.redirect('/')
+    }else{
+      res.redirect('/login')
+    }
+  })
+})
+
+
+router.get('/signup',(req,res)=>{
+  res.render('user/signup')
+})
+
+
+router.post('/signup',(req,res)=>{
+  userHelpers.doSignup(req.body).then((response)=>{
+    console.log("New user created",response);
+    res.redirect('/login')
+  })
+})
+
+router.get('/logout',(req,res)=>{
+  req.session.destroy()
+  res.redirect('/')
+})
 
 module.exports = router;

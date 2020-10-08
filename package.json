@@ -7,17 +7,18 @@
     "devStart": "nodemon ./bin/www"
   },
   "dependencies": {
+    "bcrypt": "^5.0.0",
+    "build": "mkdirp ./public/product-images",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "express-fileupload": "^1.2.0",
     "express-handlebars": "^5.1.0",
+    "express-session": "^1.17.1",
     "hbs": "^4.1.1",
     "http-errors": "~1.6.3",
     "mkdirp": "^1.0.4",
     "mongodb": "^3.6.2",
-    "morgan": "~1.9.1",
-    "build": "mkdirp ./public/product-images"
+    "morgan": "~1.9.1"
   }
-  
 }
