@@ -1,3 +1,13 @@
 .dropdown-item:focus, .dropdown-item:hover{
     background-color: #7952b3;
 }
+
+.card{
+    border-radius: 1rem;
+    border: 2px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-img, .card-img-top {
+    border-top-left-radius: calc(1rem - 1px);
+    border-top-right-radius: calc(1rem - 1px);
+}

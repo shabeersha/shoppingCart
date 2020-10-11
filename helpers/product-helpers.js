@@ -43,7 +43,6 @@ module.exports={
                     Category:proDetails.Category
                 }
             }).then((response)=>{
-                
                 resolve()
             })
         })
