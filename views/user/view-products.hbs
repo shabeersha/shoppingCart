@@ -6,12 +6,12 @@
 
             <div class="col-6 col-md-3 col-lg-2 mt-3">
                 <div class="card">
-                    <img src="/product-images/{{this._id}}.jpg" class="card-img-top" alt="{{this.Name}}">
+                    <img src="/product-images/{{this._id}}.jpg" class="card-img-top"  alt="{{this.Name}}">
                     <div class="card-body">
-                        <h5 class="card-title">{{this.Name}}</h5>
-                        <p class="card-text">{{this.Description}}</p>
+                        <h5 class="card-title text-truncate">{{this.Name}}</h5>
+                        <p class="card-text text-truncate">{{this.Description}}</p>
                         <p>{{this.Price}}/- INR</p>
-                        <a href="/add-to-cart/{{this._id}}" class="btn btn-primary">Add to cart</a>
+                        <button class="btn btn-primary" onclick="addToCart('{{this._id}}')">Add to Cart</button>
                     </div>
                 </div>
             </div>
