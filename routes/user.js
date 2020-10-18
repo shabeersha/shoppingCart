@@ -72,10 +72,10 @@ router.get('/logout',(req,res)=>{
 router.get('/cart',verifyLogin,async(req,res)=>{
   let user = req.session.user
   let cartCount = await userHelpers.getCartCount(req.session.user._id)
-  let products = await userHelpers.getCartProducts(req.session.user._id)
-  console.log(products);
+  let cartProducts = await userHelpers.getCartProducts(req.session.user._id)
+  console.log(cartProducts);
   
-  res.render('user/cart',{user,products,cartCount})
+  res.render('user/cart',{user,cartProducts,cartCount})
 })
 
 router.get('/add-to-cart/:id',verifyLogin,(req,res)=>{
@@ -85,6 +85,19 @@ router.get('/add-to-cart/:id',verifyLogin,(req,res)=>{
     res.json({status:true})
   })
 
+})
+
+
+router.post('/change-product-quantity',(req,res)=>{
+  userHelpers.changeProductQuantity(req.body).then((response)=>{
+    res.json(response)
+  })
+})
+
+
+router.get('/place-order',verifyLogin,async (req,res)=>{
+  let total= await userHelpers.getTotalAmount(req.session.user._id)
+  res.render('user/place-order',{total})
 })
 
 
