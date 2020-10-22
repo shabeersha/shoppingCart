@@ -21,6 +21,10 @@ module.exports={
               let response ={}
             let user=await db.get().collection(collections.USER_COLLECTION).findOne({Email:userData.Email})
 
+            console.log("user data")
+            console.log(user._id)
+            console.log("user data End")
+
             if(user){
                 bcrypt.compare(userData.Password,user.Password).then((status)=>{
                     if(status){
@@ -149,8 +153,9 @@ module.exports={
             })
     },
     getTotalAmount:(userId)=>{
+        console.log(userId,"userid+152")
         return new Promise(async(resolve,reject)=>{
-            let total = await db.get().collection(collections.CART_COLLECTION).aggregate([
+            let Total = await db.get().collection(collections.CART_COLLECTION).aggregate([
                 {
                     $match:{user:objectId(userId)}
                 },
@@ -183,7 +188,8 @@ module.exports={
                 
             ]).toArray()
             
-            resolve(total[0].total)
+            
+            resolve(Total[0].total) //totalprice
         })
 
     }
