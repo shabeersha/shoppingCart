@@ -4,6 +4,12 @@ const bcrypt=require('bcrypt')
 const { ObjectID } = require('mongodb')
 const { response } = require('express')
 var objectId=require('mongodb').ObjectID
+const Razorpay = require('razorpay')
+
+var instance = new Razorpay({
+    key_id: 'rzp_test_PJV8XIlAVTQAnq',
+    key_secret: 'XVjjy30VpLq0W0ulMqaK7nEQ',
+  });
 
 module.exports={
     doSignup:(userData)=>{
@@ -62,7 +68,7 @@ module.exports={
                         $inc:{'products.$.quantity':1}
                     }
                         ).then(()=>{
-                            resolve()
+                            resolve({status:true})
                         })
                 }else{
                 db.get().collection(collections.CART_COLLECTION)
@@ -74,7 +80,7 @@ module.exports={
 
                     }
                 ).then((response)=>{
-                    resolve()
+                    resolve({status:true})
                 })
             }
 
@@ -85,7 +91,7 @@ module.exports={
                 }
 
                 db.get().collection(collections.CART_COLLECTION).insertOne(cartObj).then((response)=>{
-                    resolve()
+                    resolve({status:true})
                 })
             }
         })
@@ -145,7 +151,7 @@ module.exports={
                     {
                         $inc:{'products.$.quantity':details.count}
                     }).then((response)=>{  
-                            resolve(true)
+                            resolve({status:true})
                         })
                 }
         
@@ -187,11 +193,106 @@ module.exports={
                 }
                 
             ]).toArray()
+            console.log(Total.length)
+            if(Total.length){
+                resolve(Total[0].total) //totalprice
+            }else{
+                resolve()
+            }
             
             
-            resolve(Total[0].total) //totalprice
         })
 
+    },
+    placeOrder:(order,products,total)=>{
+        return new Promise((resolve,reject)=>{
+            console.log(order,products,total)
+            let status=order['payment-method']==='COD'?'placed':'pending'
+            let orderObj={
+                deliveryDetails:{
+                    mobile:order.mobile,
+                    address:order.address,
+                    pincode:order.pincode
+                },
+                userId:objectId(order.userId),
+                paymentMethod:order['payment-method'],
+                products:products,
+                totalAmount:total,
+                status:status,
+                date:new Date()
+            }
+            db.get().collection(collections.ORDER_COLLECTION).insertOne(orderObj).then((response)=>{
+                db.get().collection(collections.CART_COLLECTION).removeOne({user:objectId(order.userId)})
+                resolve(response.ops[0]._id)
+            })
+        })
+        
+    },
+    getCartProductsList:(userId)=>{
+        return new Promise(async(resolve,reject)=>{
+            
+            let cart=await db.get().collection(collections.CART_COLLECTION).findOne({user:objectId(userId)})
+            
+                resolve(cart.products)
+            
+            
+        })
+    },
+    getUserOrders:(userId)=>{
+        return new Promise(async(resolve,reject)=>{
+            console.log(userId)
+            let orders=await db.get().collection(collections.ORDER_COLLECTION)
+                .find({userId:objectId(userId)}).toArray()
+            
+            console.log(orders)
+            resolve(orders)
+        })
+    },
+    getOrderProducts:(orderId)=>{
+        console.log(orderId)
+        return new Promise(async(resolve,reject)=>{
+            let orderItems = await db.get().collection(collections.ORDER_COLLECTION).aggregate([
+                {
+                    $match:{_id:objectId(orderId)}
+                },{
+                    $unwind:'$products'
+                },{
+                    $project:{
+                        item:'$products.item',
+                        quantity:'$products.quantity'
+                    }
+                },{
+                    $lookup:{
+                        from:collections.PRODUCT_COLLECTION,
+                        localField:'item',
+                        foreignField:'_id',
+                        as:'product'
+                    }
+                },{
+                    $project:{item:1,quantity:1,product:{$arrayElemAt:['$product',0]}}
+                }
+                
+            ]).toArray()
+            console.log(orderItems,"order items")
+            resolve(orderItems)
+        })
+
+    },
+    generateRazorpay:(orderId,total)=>{
+        return new Promise((resolve,reject)=>{
+            var options = {
+                amount: total,  // amount in the smallest currency unit
+                currency: "INR",
+                receipt: ""+orderId
+              };
+              instance.orders.create(options, function(err, order) {
+                console.log(order);
+                resolve(order)
+              });
+        })
+    },
+    verifyPayment:(details)=>{
+        return new Promise
     }
 
     

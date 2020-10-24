@@ -9,10 +9,11 @@
                         <input class="form-control" type="text" id="address" name="address">
 
                         <label for="">Mobile</label>
-                        <input class="form-control" type="text" id="Mobile" name="Mobile">
+                        <input class="form-control" type="text" id="mobile" name="mobile">
+                        <input class="form-control" type="text" id="userId" name="userId" value="{{user._id}}" hidden>
 
                         <label for="">Pincode</label>
-                        <input class="form-control" type="text" id="pincode" name="pincode">
+                        <input class="form-control" type="number" id="pincode" name="pincode">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -35,24 +36,94 @@
         </form>
     </div>
 </section>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    $("#check-out").submit((e) => {
+        console.log("clicked")
+        e.preventDefault()
+        $.ajax({
+            url: '/place-order',
+            method: 'post',
+            data: $('#check-out').serialize(),
+            success: (response) => {
+                alert(response)
+                if (response.codSuccess) {
+                    location.href = '/order-success'
+                } else {
+                    console.log("razorpay")
+                    razorpayPayment(response)
+                }
+            }
+        })
+    })
+
+    function razorpayPayment(order) {
+        var options = {
+            "key": "rzp_test_PJV8XIlAVTQAnq", // Enter the Key ID generated from the Dashboard
+            "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+            "currency": "INR",
+            "name": "Sookart",
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",
+            "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+            "handler": function (response) {
+
+
+                verifyPayment(response,order)
+            },
+            "prefill": {
+                "name": "Gaurav Kumar",
+                "email": "gaurav.kumar@example.com",
+                "contact": "9999999999"
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#F37254"
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+    }
+
+    function verifyPayment(payment,order){
+        $.ajax({
+            url:'/verify-payment',
+            data:{
+                payment,
+                order
+            },
+            method:'post'
+        })
+
+    }
+</script>
+
+
+
+
+
 <style>
-    input[type=radio]{
+    input[type=radio] {
         width: 20px;
         height: 20px;
     }
-    
-    label.radio-inline{
+
+    label.radio-inline {
         display: flex;
         align-items: center;
-        
+
     }
-    .checkout{
+
+    .checkout {
         border: 1px solid;
         border-radius: 3px;
         padding: 30px;
     }
-    .payment{
+
+    .payment {
         padding-bottom: 16px;
     }
-    
 </style>

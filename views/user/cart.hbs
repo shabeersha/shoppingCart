@@ -1,6 +1,8 @@
 <section>
     <div class="container">
-        <table class="table mt-5">
+        
+        {{#if cartProducts}}
+                <table class="table mt-5">
             <thead>
                 <tr>
                     <th scope="col">Item</th>
@@ -17,9 +19,9 @@
                     <td>{{this.product.Name}}</td>
                     
                     <td>
-                        <button class="cart-item-count mr-3" onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1)">-</button>
+                        <button class="cart-item-count mr-3" onclick="changeQuantity('{{this._id}}','{{this.product._id}}','{{../user._id}}',-1)">-</button>
                         <span id="{{this.product._id}}">{{this.quantity}}</span>
-                        <button class="cart-item-count ml-3" onclick="changeQuantity('{{this._id}}','{{this.product._id}}',1)">+</button>
+                        <button class="cart-item-count ml-3" onclick="changeQuantity('{{this._id}}','{{this.product._id}}','{{../user._id}}',1)">+</button>
                     </td>
                     <td>
                         {{this.product.Price}}/-
@@ -33,10 +35,18 @@
         </table>
         <hr>
         <div class="float-right pr-5">
-        <h3 class="float-left mr-5">Total: INR <span id="total">{{totalValue}}</span></h3>
+        <h3 class="float-left mr-5">
+            {{#if totalValue}}
+                Total: INR <span id="total">{{totalValue}}
+            {{/if}}
+            </span></h3>
         <a href="/place-order" class="btn btn-success btn-lg ">Place Order</a>
 
         </div>
+        {{else}}
+
+        Cart Empty
+        {{/if}}
         
 
 
@@ -46,12 +56,13 @@
 
 
 <script>
-    function changeQuantity(cartId,proId,count){
+    function changeQuantity(cartId,proId,userId,count){
         let quantity=parseInt(document.getElementById(proId).innerHTML)
         count=parseInt(count)
         $.ajax({
             url:'/change-product-quantity',
             data:{
+                userId:userId,
                 cart:cartId,
                 product:proId,
                 count:count,
@@ -64,6 +75,7 @@
                      location.reload()
                  }else{
                      document.getElementById(proId).innerHTML=quantity+count
+                     document.getElementById('total').innerHTML=response.total
                  }
                 
             } 
