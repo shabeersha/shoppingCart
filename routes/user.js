@@ -5,7 +5,7 @@ var router = express.Router();
 var productHelpers = require('../helpers/product-helpers')
 var userHelpers =require('../helpers/userHelpers')
 const verifyLogin=(req,res,next)=>{
-  if(req.session.loggedIn){
+  if(req.session.userLoggedIn){
     
     next();
   }else{
@@ -29,10 +29,10 @@ router.get('/',async function(req, res) {
 });
 
 router.get('/login',(req,res)=>{
-  if(req.session.loggedIn){
+  if(req.session.userLoggedIn){
     res.redirect('/')
   }else{
-    res.render('user/login',{loginErr:req.session.loginErr})
+    res.render('user/login',{loginErr:req.session.userLoginErr})
     req.session.loginErr = false
   }
 })
@@ -41,11 +41,11 @@ router.get('/login',(req,res)=>{
 router.post('/login',(req,res)=>{
   userHelpers.doLogin(req.body).then((response)=>{
     if(response.status){
-      req.session.loggedIn = true
+      req.session.userLoggedIn = true
       req.session.user = response.user
       res.redirect('/')
     }else{
-      req.session.loginErr="Invalid Username or Password"
+      req.session.userLoginErr="Invalid Username or Password"
       res.redirect('/login')
     }
   })
@@ -65,7 +65,8 @@ router.post('/signup',(req,res)=>{
 })
 
 router.get('/logout',(req,res)=>{
-  req.session.destroy()
+  req.session.user=null
+  req.session.userLoggedIn=false
   res.redirect('/')
 })
 
@@ -107,23 +108,23 @@ router.get('/place-order',verifyLogin,async (req,res)=>{
 })
 
 router.post('/place-order',async(req,res)=>{
-  console.log("done1");
-  console.log(req.body.userId)
+  
   let products=await userHelpers.getCartProductsList(req.body.userId)
-  console.log("done2");
+  
   let totalPrice= await userHelpers.getTotalAmount(req.body.userId)
-  console.log("done");
+  
   userHelpers.placeOrder(req.body,products,totalPrice).then((orderId)=>{
     if(req.body['payment-method']==='COD'){
       res.json({codSuccess:true})
     }else{
       userHelpers.generateRazorpay(orderId,totalPrice).then((response)=>{
+        
         res.json(response)
       })
     }
     
   })
-  console.log(req.body)
+  
 
 })
 
@@ -140,7 +141,7 @@ router.get('/orders',verifyLogin,(async(req,res)=>{
 
 router.get('/view-order-products/:id',verifyLogin,(async(req,res)=>{
   let products=await userHelpers.getOrderProducts(req.params.id)
-  console.log(products,"132")
+   
   res.render('user/view-order-products',{user:req.session.user,products})
 }))
 
